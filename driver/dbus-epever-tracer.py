@@ -365,7 +365,7 @@ class DbusEpever(object):
             self._dbusservice['/Dc/0/Voltage'] = c3100[4]/100      # Register 0x3104: Battery voltage (V), divide by 100
             self._dbusservice['/Dc/0/Current'] = c3100[5]/100      # Register 0x3105: Battery charging current (A), divide by 100
             self._dbusservice['/Pv/V'] = c3100[0]/100              # Register 0x3100: PV array voltage (V), divide by 100
-            self._dbusservice['/Yield/Power'] = round((c3100[2] | c3100[3] << 8)/100) # Registers 0x3102-0x3103: PV array charging power (W), divide by 100
+            self._dbusservice['/Yield/Power'] = round((c3100[2] | c3100[3] << 16)/100) # Registers 0x3102-0x3103: PV array charging power (W), divide by 100
             self._dbusservice['/Load/I'] = c3100[13]/100           # Register 0x310D: Load current (A), divide by 100
 
             # Calculate the Victron compatible error code from the EPEVER
@@ -456,17 +456,17 @@ class DbusEpever(object):
             
             # Registers 0x3312-0x3313: Total generated energy (kWh), divide by 100
             # Combine two 16-bit registers into one 32-bit value
-            self._dbusservice['/Yield/User'] = (c3300[12] | c3300[13] << 8)/100
-            self._dbusservice['/Yield/System'] = (c3300[12] | c3300[13] << 8)/100
+            self._dbusservice['/Yield/User'] = (c3300[12] | c3300[13] << 16)/100
+            self._dbusservice['/Yield/System'] = (c3300[12] | c3300[13] << 16)/100
             
             # Registers 0x330C-0x330D: Daily generated energy (kWh), divide by 100
             # Used as today's yield value
-            self._dbusservice['/History/Daily/0/Yield'] = (c330C[0] | c330C[1] << 8)/100
+            self._dbusservice['/History/Daily/0/Yield'] = (c330C[0] | c330C[1] << 16)/100
             
             # Update yesterday's yield from EPEVER registers
             # Registers at REGISTER_HISTORY_PREV_DAY (0x330C): Previous day's energy
             # c330C[0-1] contains yesterday's generated energy
-            yesterday_yield = (c330C[0] | c330C[1] << 8)/100
+            yesterday_yield = (c330C[0] | c330C[1] << 16)/100
             if yesterday_yield > 0:
                 self._dbusservice['/History/Daily/1/Yield'] = yesterday_yield
 
